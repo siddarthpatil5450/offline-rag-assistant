@@ -9,6 +9,11 @@ Everything runs **entirely on your own machine**. No cloud API calls, no data
 leaving your device. It uses a local embedding model, a local vector database, and
 a local LLM served through [Ollama](https://ollama.com).
 
+Works on **macOS, Windows, and Linux**. Everything here is plain Python plus
+Ollama, both of which run natively on all three; there's nothing OS-specific
+in the core pipeline. A few command examples below show both a Unix-style and
+a Windows PowerShell version where the syntax actually differs.
+
 Built as a working prototype for an internal logistics use case (carrier contracts
 and shipment/rate data), then generalized here so anyone can point it at their own
 documents. This is a learning/portfolio project, not a polished product. Read the
@@ -55,8 +60,9 @@ pages).
 
 ### 1. Install prerequisites
 
-- Python 3.10+
-- [Ollama](https://ollama.com), then pull a model: `ollama pull llama3.2`
+- Python 3.10+ ([python.org](https://python.org), or `brew install python` on macOS)
+- [Ollama](https://ollama.com) (native installers for macOS, Windows, and Linux),
+  then pull a model: `ollama pull llama3.2`
 
 ### 2. Install dependencies
 
@@ -64,19 +70,25 @@ pages).
 pip install -r requirements.txt
 ```
 
+On macOS/Linux you may prefer `pip3` depending on how Python was installed.
+On Windows, if `pip` isn't recognized, use `python -m pip install -r requirements.txt`.
+
 ### 3. Point it at YOUR documents
 
 This is the main thing to customize. There's no hardcoded document folder.
 You pass your own folder/file path directly on the command line:
 
 ```bash
+# macOS / Linux
 python rag3.py ingest "/path/to/your/documents/contract1.pdf"
-python rag3.py ingest "/path/to/your/documents/contract2.pdf"
+
+# Windows (PowerShell)
+python rag3.py ingest "C:\path\to\your\documents\contract1.pdf"
 ```
 
-Replace `/path/to/your/documents/...` with wherever your own files actually live
-on your computer. Run this once per file (or write a loop over a folder; see
-`cmd_ingest` in `rag3.py`).
+Replace the path with wherever your own files actually live on your computer.
+Run this once per file (or write a loop over a folder; see `cmd_ingest` in
+`rag3.py`).
 
 Everything the pipeline generates (the vector database, the OCR cache, the
 auto-generated document index) is created automatically inside `rag_data3/`

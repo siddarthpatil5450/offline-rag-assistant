@@ -53,9 +53,11 @@ DATA_KEYWORDS = [
     "show rows", "list rows", "filter", "where", "columns",
     "container number", "give container", "show container", "list container",
     # rate / pricing terms — these must never fall through to semantic search,
-    # because rag3.py's chunks of a rate table are messy/unreliable for exact numbers
-    "rate", "rates", "d/c", "dc%", "zone", "zip code", "postal code",
-    "pricing", "price", "accessorial", "tms zone", "min for", "min rate",
+    # because rag3.py's chunks of a rate table are messy/unreliable for exact numbers.
+    # CUSTOMIZE: these are generic freight-industry examples; swap in whatever
+    # vocabulary actually matches YOUR structured data's column names.
+    "rate", "rates", "zone", "zip code", "postal code",
+    "pricing", "price", "accessorial", "min for", "min rate",
 ]
 
 # ============================================================================
@@ -89,7 +91,7 @@ def guess_table(question, override=None):
     # If it's clearly a rate/pricing question but no vendor named, guess the
     # only rate table you currently have. CUSTOMIZE: update the table name
     # and rate_words below to match your own schema as you add tables.
-    rate_words = ["rate", "min", "d/c", "zone", "zip code", "postal code", "pricing", "accessorial"]
+    rate_words = ["rate", "min", "zone", "zip code", "postal code", "pricing", "accessorial"]
     if any(_contains_keyword(q_lower, w) for w in rate_words):
         return "vendor_rates"  # <-- CUSTOMIZE: your real rate/pricing table name
     return DEFAULT_TABLE
@@ -108,7 +110,7 @@ def ask_data(question, table):
 def main():
     if len(sys.argv) < 2:
         print("Usage: python ask.py \"your question\"")
-        print("       python ask.py \"your question\" --table pitt_ohio_rates")
+        print("       python ask.py \"your question\" --table vendor_rates")
         return
 
     args  = sys.argv[1:]

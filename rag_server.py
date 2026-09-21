@@ -575,7 +575,7 @@ def ask_contracts(req: QuestionRequest):
 
 @app.post("/ask/data")
 def ask_data(req: DataQuestionRequest):
-    """Ask a plain-English question about a SQL table (e.g. pitt_ohio_rates, shipments)."""
+    """Ask a plain-English question about a SQL table (e.g. vendor_rates, shipments)."""
     return _answer_data_question(req.table, req.question, req.history)
 
 
