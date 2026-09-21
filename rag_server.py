@@ -17,11 +17,17 @@ Then open http://<this laptop's IP>:8000 in a browser for the chat UI, or
 use PowerShell's Invoke-RestMethod to hit the JSON endpoints directly.
 """
 
-import ssl
 import os
-ssl._create_default_https_context = ssl._create_unverified_context
-os.environ["CURL_CA_BUNDLE"] = ""
-os.environ["REQUESTS_CA_BUNDLE"] = ""
+
+# See rag3.py for why this is opt-in only, not on by default: disabling TLS
+# certificate verification globally is a real security risk, not a style
+# choice. Only set this if you're behind a corporate proxy that re-signs
+# certificates and you've confirmed you actually need it.
+if os.environ.get("ALLOW_INSECURE_SSL") == "1":
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+    os.environ["CURL_CA_BUNDLE"] = ""
+    os.environ["REQUESTS_CA_BUNDLE"] = ""
 
 import time
 import shutil

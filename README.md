@@ -1,4 +1,4 @@
-# Local Knowledge Assistant
+# Advanced RAG Pipeline
 
 A retrieval-augmented generation (RAG) pipeline that lets you ask natural-language
 questions about your own documents (contracts, SOPs, reports, anything text-based)
@@ -20,6 +20,12 @@ along the way.
 - **Document Q&A** — chunk, embed, and index any set of documents (PDF, DOCX,
   CSV/XLSX, or plain text) into a vector store; ask questions and get answers with
   citations back to the exact source file and page.
+- **Automatic OCR fallback** — a PDF page is checked for a real text layer first;
+  if it's a scanned/flattened image instead, it's automatically rendered and run
+  through OCR (EasyOCR) with no manual flag needed. Each OCR'd page is cached to
+  disk immediately after processing, so an interrupted ingest (laptop sleep,
+  closed terminal, crash) resumes from where it left off instead of re-paying the
+  OCR cost for pages already done.
 - **Text-to-SQL** — ask plain-English questions against a SQL database; the LLM
   generates the query, with an automatic retry if the first attempt fails or looks
   wrong.
@@ -100,6 +106,19 @@ uvicorn rag_server:app --host 0.0.0.0 --port 8000
 
 Open `http://localhost:8000` for the chat UI, or `http://localhost:8000/admin`
 for the document upload page.
+
+### Troubleshooting: corporate proxy / SSL certificate errors
+
+If you're on a corporate network with a proxy that re-signs TLS certificates,
+you may see SSL verification errors when the model or embedding files download.
+Certificate verification is intentionally **on by default** here — disabling
+it globally is a real security risk, not a style choice. If you've confirmed
+you actually need to bypass it, set this environment variable before running
+any command (do not do this on a network you don't trust):
+
+```bash
+export ALLOW_INSECURE_SSL=1   # PowerShell: $env:ALLOW_INSECURE_SSL = "1"
+```
 
 ## Customization points
 

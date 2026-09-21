@@ -1,9 +1,21 @@
-import ssl
 import os
-# Corporate proxy SSL bypass — work laptop certificate fix
-ssl._create_default_https_context = ssl._create_unverified_context
-os.environ["CURL_CA_BUNDLE"] = ""
-os.environ["REQUESTS_CA_BUNDLE"] = ""
+
+# ============================================================================
+# If you're behind a corporate proxy that does SSL/TLS inspection (re-signs
+# certificates), Python's default cert verification can fail on outbound
+# calls. DO NOT disable certificate verification globally by default — that
+# silently turns off TLS protection for every HTTPS request this process
+# makes, which is a real security risk, not just a style issue. Only enable
+# this explicitly, and only if you've confirmed you actually need it:
+#
+#   ALLOW_INSECURE_SSL=1 python rag3.py ingest ...
+#
+if os.environ.get("ALLOW_INSECURE_SSL") == "1":
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+    os.environ["CURL_CA_BUNDLE"] = ""
+    os.environ["REQUESTS_CA_BUNDLE"] = ""
+# ============================================================================
 
 import re
 import json
