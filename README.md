@@ -20,17 +20,21 @@ documents. This is a learning/portfolio project, not a polished product. Read th
 code; it's commented throughout with the actual bugs that were found and fixed
 along the way.
 
+![Architecture diagram](assets/architecture-diagram.svg)
+
 ## What it does
 
 - **Document Q&A.** Chunk, embed, and index any set of documents (PDF, DOCX,
-  CSV/XLSX, or plain text) into a vector store, then ask questions and get answers
-  with citations back to the exact source file and page.
+  CSV/XLSX, plain text, or a standalone image) into a vector store, then ask
+  questions and get answers with citations back to the exact source file and page.
 - **Automatic OCR fallback.** A PDF page is checked for a real text layer first.
   If it's a scanned or flattened image instead, it's automatically rendered and run
-  through OCR (EasyOCR), with no manual flag needed. Each OCR'd page is cached to
-  disk immediately after processing, so an interrupted ingest (laptop sleep,
-  closed terminal, crash) resumes from where it left off instead of re-paying the
-  OCR cost for pages already done.
+  through OCR (EasyOCR), with no manual flag needed. The same OCR path also handles
+  a standalone screenshot or photo of a page or table (PNG/JPG/etc.) dropped in on
+  its own, not just images embedded inside a PDF. Each OCR'd page or image is
+  cached to disk immediately after processing, so an interrupted ingest (laptop
+  sleep, closed terminal, crash) resumes from where it left off instead of
+  re-paying the OCR cost for pages already done.
 - **Text-to-SQL.** Ask plain-English questions against a SQL database; the LLM
   generates the query, with an automatic retry if the first attempt fails or looks
   wrong.

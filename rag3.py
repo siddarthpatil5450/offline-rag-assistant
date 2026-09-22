@@ -163,13 +163,38 @@ def load_web(url):
     return "\n".join(lines)
 
 
+def load_image(path):
+    """
+    Run OCR directly on a standalone image file — e.g. a phone photo or
+    screenshot of a table, a whiteboard, a printed page someone snapped a
+    picture of. Same lazy-loaded EasyOCR reader and page-checkpoint cache
+    used for scanned PDF pages in load_pdf(), just applied to one image
+    instead of one page of a multi-page document.
+    """
+    cache_path = get_ocr_cache_path(path, 0)
+    if cache_path.exists():
+        cached_text = cache_path.read_text(encoding="utf-8")
+        print(f"    Image loaded from OCR cache ({len(cached_text)} chars)")
+        return [(1, cached_text)]
+
+    import easyocr
+    print("    (running OCR on standalone image — this happens once per file)")
+    reader   = easyocr.Reader(["en"], gpu=False)
+    results  = reader.readtext(str(path))
+    ocr_text = "\n".join(block[1] for block in results)
+
+    cache_path.write_text(ocr_text, encoding="utf-8")
+    print(f"    OCR complete ({len(ocr_text)} chars) — checkpoint saved")
+    return [(1, ocr_text)]
+
+
 def load_document(source):
     """
     Returns (pages, name) where pages is always a list of (page_number, text)
     tuples — for PDFs, page_number is the real page. For document types that
-    don't have "pages" (Word, Excel, web, plain text), we use page_number=1
-    as a single unit, so downstream code (chunking, metadata) can treat every
-    document type the same way.
+    don't have "pages" (Word, Excel, web, plain text, standalone images), we
+    use page_number=1 as a single unit, so downstream code (chunking,
+    metadata) can treat every document type the same way.
     """
     if source.startswith(("http://", "https://")):
         return [(1, load_web(source))], source
@@ -181,6 +206,8 @@ def load_document(source):
         return [(1, load_docx(str(path)))], path.name
     elif ext in (".csv", ".xlsx", ".xls"):
         return [(1, load_csv_excel(str(path)))], path.name
+    elif ext in (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff"):
+        return load_image(str(path)), path.name
     else:
         return [(1, path.read_text(encoding="utf-8", errors="ignore"))], path.name
 
